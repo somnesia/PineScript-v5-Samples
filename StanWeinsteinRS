@@ -1,0 +1,23 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// credit QuantTrader v4 code on YouTube
+//@version=5
+strategy("StanTheManv1", overlay=false)
+comparativeTickerId = input.symbol("SPY",  title="Comparative Symbol")
+l = input.int(50, minval=1, title="Period")
+baseSymbol = request.security(syminfo.tickerid, timeframe.period, close)
+comparativeSymbol = request.security(comparativeTickerId, timeframe.period, close)
+hline(0, color=color.black, linestyle=hline.style_dotted)
+res = baseSymbol / baseSymbol[l] / 
+ (comparativeSymbol / comparativeSymbol[l]) - 1
+plot(res, title="RS", color=#1155CC)
+//volume ma
+vol1 = ta.sma(volume,5)
+// 30 week ma
+sma1 = ta.sma(close, 30)
+//consolidation
+h1 = ta.highest(high[1],52)
+// trade conditions
+if close>sma1 and res>0 and volume>vol1 and close>h1
+    strategy.entry("long",strategy.long)
+if close<sma1
+    strategy.close("long")
